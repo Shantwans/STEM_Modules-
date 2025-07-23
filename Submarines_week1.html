@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 1: Submarine Adventure!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            font-size: 3em;
+            color: #FFD700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: #E6F3FF;
+        }
+
+        .activity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .activity-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .activity-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .activity-title {
+            font-size: 1.5em;
+            color: #FFD700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon {
+            font-size: 1.2em;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 1em;
+            margin-bottom: 15px;
+            font-family: inherit;
+        }
+
+        .input-field:focus {
+            outline: 3px solid #FFD700;
+            transform: scale(1.02);
+        }
+
+        textarea.input-field {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .submarine-builder {
+            min-height: 300px;
+            background: linear-gradient(180deg, #87CEEB 0%, #4682B4 100%);
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .submarine {
+            position: absolute;
+            width: 200px;
+            height: 80px;
+            background: #2C3E50;
+            border-radius: 40px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.5s ease;
+            cursor: move;
+        }
+
+        .submarine::before {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: #34495E;
+            border-radius: 50%;
+            top: 20px;
+            left: 80px;
+        }
+
+        .submarine::after {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 20px;
+            background: #E74C3C;
+            border-radius: 10px;
+            top: 30px;
+            right: -30px;
+        }
+
+        .bubbles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: bubble-rise 4s infinite linear;
+        }
+
+        @keyframes bubble-rise {
+            from {
+                bottom: -50px;
+                opacity: 0.7;
+            }
+            to {
+                bottom: 100%;
+                opacity: 0;
+            }
+        }
+
+        .depth-meter {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .badge {
+            display: inline-block;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #333;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 5px;
+            animation: sparkle 2s infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .fun-fact {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border-left: 5px solid #FFD700;
+        }
+
+        .drawing-canvas {
+            border: 3px dashed rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            margin: 15px 0;
+            cursor: crosshair;
+        }
+
+        .save-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            z-index: 1000;
+        }
+
+        .save-btn:hover {
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            .activity-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .submarine {
+                width: 150px;
+                height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚢 Submarine Adventure!</h1>
+            <p>Explore the depths of STEM learning</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="overallProgress"></div>
+            </div>
+            <p>Mission Progress: <span id="progressText">0%</span></p>
+        </div>
+
+        <div class="activity-grid">
+            <!-- Kickoff Question -->
+            <div class="activity-card">
+                <div class="activity-title">
+                    <span class="icon">🤔</span>
+                    Kickoff Question
+                </div>
+                <p>What's the first word that comes to your mind when you hear 'submarine'?</p>
+                <input type="text" class="input-field" id="kickoffAnswer" placeholder="Type your answer here..." onchange="updateProgress()">
+                <div id="kickoffBadge"></div>
+            </div>
+
+            <!-- Visual Thinking -->
+            <div class="activity-card">
+                <div class="activity-title">
+                    <span class="icon">👁️</span>
+                    Visual Thinking
+                </div>
+                <div class="submarine-builder" id="submarineScene">
+                    <div class="submarine" id="submarine"></div>
+                    <div class="bubbles" id="bubbles"></div>
+                    <div class="depth-meter">
+                        <div>DEPTH</div>
+                        <div id="depthReading">0m</div>
+                        <div>PRESSURE</div>
+                        <div id="pressureReading">1 ATM</div>
+                    </div>
+                </div>
+                <textarea class="input-field" id="observations" placeholder="What do you observe about submarines underwater?" onchange="updateProgress()"></textarea>
+                <textarea class="input-field" id="questions" placeholder="What questions do you have?" onchange="updateProgress()"></textarea>
+            </div>
+
+            <!-- Build It -->
+            <div class="activity-card">
+                <div class="activity-title">
+                    <span class="icon">🔧</span>
+                    Build It
+                </div>
+                <p>Design your submarine components:</p>
+                <select class="input-field" id="hullType" onchange="updateSubmarineDesign(); updateProgress();">
+                    <option value="">Choose hull type...</option>
+                    <option value="torpedo">Torpedo Shape</option>
+                    <option value="research">Research Vessel</option>
+                    <option value="military">Military Submarine</option>
+                </select>
+                <select class="input-field" id="propellerType" onchange="updateSubmarineDesign(); updateProgress();">
+                    <option value="">Choose propeller...</option>
+                    <option value="single">Single Propeller</option>
+                    <option value="twin">Twin Propellers</option>
+                    <option value="jet">Water Jet</option>
+                </select>
+                <input type="color" class="input-field" id="submarineColor" value="#2C3E50" onchange="updateSubmarineDesign()">
+                <button class="btn" onclick="testSubmarineMovement()">🚀 Test Movement</button>
+            </div>
+
+            <!-- Experiment -->
+            <div class="activity-card">
+                <div class="activity-title">
+                    <span class="icon">🧪</span>
+                    Experiment
+                </div>
+                <p>Virtual Propeller Testing:</p>
+                <label>Propeller Size: <span id="sizeValue">50</span>%</label>
+                <input type="range" class="input-field" id="propellerSize" min="25" max="100" value="50" oninput="updatePropellerTest()">
+                <label>Rotation Speed: <span id="speedValue">50</span>%</label>
+                <input type="range" class="input-field" id="rotationSpeed" min="10" max="100" value="50" oninput="updatePropellerTest()">
+                <div id="experimentResults"></div>
+                <textarea class="input-field" id="experimentObservations" placeholder="What did you observe from your experiments?" onchange="updateProgress()"></textarea>
+            </div>
+
+            <!-- Design Time -->
+            <div class="activity-card">
+                <div class="activity-title">
+                    <span class="icon">🎨</span>
+                    Design Time
+                </div>
+                <p>Draw your dream submarine:</p>
+                <canvas class="drawing-canvas" id="drawingCanvas" width="300" height="200"></canvas>
+                <button class="btn" onclick="clearCanvas()">Clear</button>
+                <button class="btn" onclick="saveDrawing()">Save Drawing</button>
+                <textarea class="input-field" id="designExplanation" placeholder="Explain your submarine design and its special features..." onchange="updateProgress()"></textarea>
+            </div>
+
+            <!-- Imagine If -->
+            <div class="activity-card">
+                <div class="activity-title">
+                    <span class="icon">💭</span>
+                    Imagine If...
+                </div>
+                <p>What if submarines were made of glass?</p>
+                <textarea class="input-field" id="advantages" placeholder="What would be the advantages?" onchange="updateProgress()"></textarea>
+                <textarea class="input-field" id="disadvantages" placeholder="What would be the disadvantages?" onchange="updateProgress()"></textarea>
+            </div>
+        </div>
+
+        <!-- Reflection Section -->
+        <div class="activity-card">
+            <div class="activity-title">
+                <span class="icon">🎓</span>
+                Reflection & Learning
+            </div>
+            <textarea class="input-field" id="materialsUsed" placeholder="What materials would you use for your submarine project?" onchange="updateProgress()"></textarea>
+            <textarea class="input-field" id="whatLearned" placeholder="What new things did you learn about submarines and the ocean?" onchange="updateProgress()"></textarea>
+            <div id="earnedBadges"></div>
+        </div>
+
+        <!-- Fun Fact -->
+        <div class="fun-fact">
+            <h3>🌊 Fun Fact!</h3>
+            <p>Did you know the deepest submarine dive ever was 10,928 meters? That's deeper than Mount Everest is tall! The pressure down there is over 1,000 times greater than at sea level!</p>
+        </div>
+    </div>
+
+    <!-- Save Progress Button -->
+    <button class="save-btn" onclick="saveProgress()" title="Save Progress">💾</button>
+
+    <script>
+        // Global variables for tracking progress and interactions
+        let completedActivities = new Set();
+        let submarinePosition = { x: 50, y: 50 };
+        let isDrawing = false;
+        let canvas, ctx;
+
+        // Initialize the module
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCanvas();
+            createBubbles();
+            loadProgress();
+            updateProgress();
+            
+            // Make submarine draggable
+            makeSubmarineDraggable();
+        });
+
+        function initializeCanvas() {
+            canvas = document.getElementById('drawingCanvas');
+            ctx = canvas.getContext('2d');
+            
+            // Set up drawing events
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            
+            // Touch events for mobile
+            canvas.addEventListener('touchstart', handleTouch);
+            canvas.addEventListener('touchmove', handleTouch);
+            canvas.addEventListener('touchend', stopDrawing);
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#2C3E50';
+            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            ctx.stroke();
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+            updateProgress();
+        }
+
+        function handleTouch(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' : 
+                                            e.type === 'touchmove' ? 'mousemove' : 'mouseup', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            canvas.dispatchEvent(mouseEvent);
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function saveDrawing() {
+            const dataURL = canvas.toDataURL();
+            const link = document.createElement('a');
+            link.download = 'my-submarine-design.png';
+            link.href = dataURL;
+            link.click();
+            
+            showBadge('🎨 Artist Badge Earned!');
+        }
+
+        function makeSubmarineDraggable() {
+            const submarine = document.getElementById('submarine');
+            const scene = document.getElementById('submarineScene');
+            let isDragging = false;
+            let startX, startY;
+
+            submarine.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                startX = e.clientX - submarine.offsetLeft;
+                startY = e.clientY - submarine.offsetTop;
+                submarine.style.cursor = 'grabbing';
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                
+                const sceneRect = scene.getBoundingClientRect();
+                let x = e.clientX - sceneRect.left - startX;
+                let y = e.clientY - sceneRect.top - startY;
+                
+                // Keep submarine within bounds
+                x = Math.max(0, Math.min(x, scene.offsetWidth - submarine.offsetWidth));
+                y = Math.max(0, Math.min(y, scene.offsetHeight - submarine.offsetHeight));
+                
+                submarine.style.left = x + 'px';
+                submarine.style.top = y + 'px';
+                submarine.style.transform = 'none';
+                
+                // Update depth based on position
+                updateDepthMeter(y / scene.offsetHeight);
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+                submarine.style.cursor = 'move';
+            });
+        }
+
+        function updateDepthMeter(ratio) {
+            const depth = Math.round(ratio * 1000);
+            const pressure = Math.round((1 + ratio * 99) * 10) / 10;
+            
+            document.getElementById('depthReading').textContent = depth + 'm';
+            document.getElementById('pressureReading').textContent = pressure + ' ATM';
+        }
+
+        function createBubbles() {
+            const bubblesContainer = document.getElementById('bubbles');
+            
+            setInterval(() => {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                bubble.style.left = Math.random() * 100 + '%';
+                bubble.style.width = bubble.style.height = (Math.random() * 20 + 10) + 'px';
+                bubble.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                
+                bubblesContainer.appendChild(bubble);
+                
+                setTimeout(() => {
+                    if (bubble.parentNode) {
+                        bubble.parentNode.removeChild(bubble);
+                    }
+                }, 5000);
+            }, 500);
+        }
+
+        function updateSubmarineDesign() {
+            const submarine = document.getElementById('submarine');
+            const hullType = document.getElementById('hullType').value;
+            const color = document.getElementById('submarineColor').value;
+            
+            submarine.style.backgroundColor = color;
+            
+            if (hullType === 'research') {
+                submarine.style.borderRadius = '20px';
+            } else if (hullType === 'military') {
+                submarine.style.borderRadius = '40px 10px';
+            } else {
+                submarine.style.borderRadius = '40px';
+            }
+        }
+
+        function testSubmarineMovement() {
+            const submarine = document.getElementById('submarine');
+            submarine.style.animation = 'none';
+            submarine.offsetHeight; // Trigger reflow
+            submarine.style.animation = 'submarine-move 3s ease-in-out';
+            
+            showBadge('🚀 Test Pilot Badge!');
+        }
+
+        function updatePropellerTest() {
+            const size = document.getElementById('propellerSize').value;
+            const speed = document.getElementById('rotationSpeed').value;
+            
+            document.getElementById('sizeValue').textContent = size;
+            document.getElementById('speedValue').textContent = speed;
+            
+            const efficiency = calculatePropellerEfficiency(size, speed);
+            document.getElementById('experimentResults').innerHTML = 
+                `<div style="background: rgba(255,255,255,0.2); padding: 10px; border-radius: 5px; margin: 10px 0;">
+                    <strong>Test Results:</strong><br>
+                    Efficiency: ${efficiency}%<br>
+                    Speed: ${Math.round(speed * efficiency / 100)} knots<br>
+                    Noise Level: ${100 - efficiency}% volume
+                </div>`;
+        }
+
+        function calculatePropellerEfficiency(size, speed) {
+            // Simple efficiency calculation for educational purposes
+            const optimalSize = 75;
+            const optimalSpeed = 60;
+            
+            const sizeEfficiency = 100 - Math.abs(size - optimalSize) * 2;
+            const speedEfficiency = 100 - Math.abs(speed - optimalSpeed) * 1.5;
+            
+            return Math.max(20, Math.round((sizeEfficiency + speedEfficiency) / 2));
+        }
+
+        function updateProgress() {
+            completedActivities.clear();
+            
+            // Check each activity for completion
+            if (document.getElementById('kickoffAnswer').value.trim()) {
+                completedActivities.add('kickoff');
+                showBadge('🎯 Explorer Badge!', 'kickoffBadge');
+            }
+            
+            if (document.getElementById('observations').value.trim() || 
+                document.getElementById('questions').value.trim()) {
+                completedActivities.add('visual');
+            }
+            
+            if (document.getElementById('hullType').value && 
+                document.getElementById('propellerType').value) {
+                completedActivities.add('build');
+            }
+            
+            if (document.getElementById('experimentObservations').value.trim()) {
+                completedActivities.add('experiment');
+            }
+            
+            if (document.getElementById('designExplanation').value.trim()) {
+                completedActivities.add('design');
+            }
+            
+            if (document.getElementById('advantages').value.trim() && 
+                document.getElementById('disadvantages').value.trim()) {
+                completedActivities.add('imagine');
+            }
+            
+            if (document.getElementById('materialsUsed').value.trim() || 
+                document.getElementById('whatLearned').value.trim()) {
+                completedActivities.add('reflection');
+            }
+            
+            // Update progress bar
+            const progress = (completedActivities.size / 7) * 100;
+            document.getElementById('overallProgress').style.width = progress + '%';
+            document.getElementById('progressText').textContent = Math.round(progress) + '%';
+            
+            // Award completion badges
+            if (completedActivities.size >= 5) {
+                showBadge('🏆 STEM Master!', 'earnedBadges');
+            } else if (completedActivities.size >= 3) {
+                showBadge('⭐ Ocean Explorer!', 'earnedBadges');
+            }
+        }
+
+        function showBadge(text, containerId = null) {
+            if (containerId) {
+                const container = document.getElementById(containerId);
+                if (!container.innerHTML.includes(text)) {
+                    container.innerHTML += `<span class="badge">${text}</span>`;
+                }
+            } else {
+                // Show temporary floating badge
+                const badge = document.createElement('div');
+                badge.className = 'badge';
+                badge.textContent = text;
+                badge.style.position = 'fixed';
+                badge.style.top = '50px';
+                badge.style.right = '20px';
+                badge.style.zIndex = '1001';
+                badge.style.animation = 'sparkle 1s ease-in-out';
+                
+                document.body.appendChild(badge);
+                
+                setTimeout(() => {
+                    if (badge.parentNode) {
+                        badge.parentNode.removeChild(badge);
+                    }
+                }, 3000);
+            }
+        }
+
+        function saveProgress() {
+            const progressData = {
+                kickoffAnswer: document.getElementById('kickoffAnswer').value,
+                observations: document.getElementById('observations').value,
+                questions: document.getElementById('questions').value,
+                hullType: document.getElementById('hullType').value,
+                propellerType: document.getElementById('propellerType').value,
+                submarineColor: document.getElementById('submarineColor').value,
+                experimentObservations: document.getElementById('experimentObservations').value,
+                designExplanation: document.getElementById('designExplanation').value,
+                advantages: document.getElementById('advantages').value,
+                disadvantages: document.getElementById('disadvantages').value,
+                materialsUsed: document.getElementById('materialsUsed').value,
+                whatLearned: document.getElementById('whatLearned').value,
+                drawing: canvas.toDataURL(),
+                timestamp: new Date().toISOString()
+            };
+            
+            // Save to browser storage
+            localStorage.setItem('submarineProgress', JSON.stringify(progressData));
+            
+            // Also create downloadable file
+            const blob = new Blob([JSON.stringify(progressData, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'submarine-adventure-progress.json';
+            link.click();
+            URL.revokeObjectURL(url);
+            
+            showBadge('💾 Progress Saved!');
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('submarineProgress');
+            if (saved) {
+                const data = JSON.parse(saved);
+                
+                // Restore all field values
+                Object.keys(data).forEach(key => {
+                    const element = document.getElementById(key);
+                    if (element && key !== 'drawing' && key !== 'timestamp') {
+                        element.value = data[key];
+                    }
+                });
+                
+                // Restore drawing
+                if (data.drawing) {
+                    const img = new Image();
+                    img.onload = function() {
+                        ctx.drawImage(img, 0, 0);
+                    };
+                    img.src = data.drawing;
+                }
+                
+                updateSubmarineDesign();
+                updateProgress();
+            }
+        }
+
+        // Add CSS animation for submarine movement
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes submarine-move {
+                0% { transform: translateX(0); }
+                50% { transform: translateX(100px) rotate(5deg); }
+                100% { transform: translateX(0) rotate(0deg); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
